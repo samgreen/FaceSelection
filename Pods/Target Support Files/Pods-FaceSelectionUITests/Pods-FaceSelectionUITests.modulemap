@@ -1,0 +1,6 @@
+framework module Pods_FaceSelectionUITests {
+  umbrella header "Pods-FaceSelectionUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
