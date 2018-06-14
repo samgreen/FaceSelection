@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedAPI;
 
 - (void)fetchFaces:(void (^)(NSArray<FaceModel *> * _Nullable faces))complete;
-- (void)fetchImage:(void (^)(void))complete;
+- (void)fetchImage:(void (^)(NSURL *))complete;
 
 @end
 

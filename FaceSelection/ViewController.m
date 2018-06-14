@@ -36,9 +36,12 @@
         self.faces = faces;
     }];
     
-    [[NetworkAPI sharedAPI] fetchImage:^{
-        // TODO: enable image view
-        self.imageView.image = nil;
+    [[NetworkAPI sharedAPI] fetchImage:^(NSURL *localImageURL) {
+        UIImage *image = [[UIImage alloc] initWithContentsOfFile:localImageURL.path];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.imageView.image = image;
+            [self.loadingIndicator stopAnimating];
+        });
     }];
 }
 
