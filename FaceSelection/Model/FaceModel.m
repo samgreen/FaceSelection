@@ -35,36 +35,42 @@ static NSString *kGenderMaleValue = @"male";
     self = [super init];
     if (self) {
         self.identifier = otherDictionary[kFaceIdentifierKey];
-        
-        // Parse the landmarks
-        NSDictionary *landmarkDictionary = otherDictionary[kFaceLandmarksKey];
-        NSMutableDictionary *parsedLandmarks = [NSMutableDictionary dictionaryWithCapacity:landmarkDictionary.allKeys.count];
-        for (NSString *name in landmarkDictionary.allKeys) {
-            NSDictionary *landmarkInfo = landmarkDictionary[name];
-            const CGFloat x = [landmarkInfo[kLandmarkOriginXKey] floatValue];
-            const CGFloat y = [landmarkInfo[kLandmarkOriginYKey] floatValue];
-            parsedLandmarks[name] = [NSValue valueWithCGPoint:CGPointMake(x, y)];
-        }
-        self.landmarks = [parsedLandmarks copy];
-        
-        // Parse the face rectangle
-        NSDictionary *rectangleDictionary = otherDictionary[kFaceRectangleKey];
-        const CGFloat x = [rectangleDictionary[kRectangleOriginXKey] floatValue];
-        const CGFloat y = [rectangleDictionary[kRectangleOriginYKey] floatValue];
-        const CGFloat width = [rectangleDictionary[kRectangleWidthKey] floatValue];
-        const CGFloat height = [rectangleDictionary[kRectangleHeightKey] floatValue];
-        self.rectangle = CGRectMake(x, y, width, height);
-        
-        // Parse the gender
-        NSDictionary *attributesDictionary = otherDictionary[kFaceAttributesKey];
-        NSString *genderValue = attributesDictionary[kAttributeGenderKey];
-        if ([genderValue isEqualToString:kGenderFemaleValue]) {
-            self.gender = FaceGenderFemale;
-        } else if ([genderValue isEqualToString:kGenderMaleValue]) {
-            self.gender = FaceGenderMale;
-        }
+        self.landmarks = [FaceModel parseLandmarksFromDictionary:otherDictionary];
+        self.rectangle = [FaceModel parseRectFromDictionary:otherDictionary];
+        self.gender = [FaceModel parseGenderFromDictionary:otherDictionary];
     }
     return self;
+}
+
++ (NSDictionary<NSString *, NSValue *> *)parseLandmarksFromDictionary:(NSDictionary *)dictionary {
+    NSDictionary *landmarkDictionary = dictionary[kFaceLandmarksKey];
+    NSMutableDictionary<NSString *, NSValue *> *parsedLandmarks = [NSMutableDictionary dictionaryWithCapacity:landmarkDictionary.allKeys.count];
+    for (NSString *name in landmarkDictionary.allKeys) {
+        NSDictionary *landmarkInfo = landmarkDictionary[name];
+        const CGFloat x = [landmarkInfo[kLandmarkOriginXKey] floatValue];
+        const CGFloat y = [landmarkInfo[kLandmarkOriginYKey] floatValue];
+        parsedLandmarks[name] = [NSValue valueWithCGPoint:CGPointMake(x, y)];
+    }
+    return [parsedLandmarks copy];
+}
+
++ (CGRect)parseRectFromDictionary:(NSDictionary *)dictionary {
+    NSDictionary *rectangleDictionary = dictionary[kFaceRectangleKey];
+    const CGFloat x = [rectangleDictionary[kRectangleOriginXKey] floatValue];
+    const CGFloat y = [rectangleDictionary[kRectangleOriginYKey] floatValue];
+    const CGFloat width = [rectangleDictionary[kRectangleWidthKey] floatValue];
+    const CGFloat height = [rectangleDictionary[kRectangleHeightKey] floatValue];
+    return CGRectMake(x, y, width, height);
+}
+
++ (FaceGender)parseGenderFromDictionary:(NSDictionary *)dictionary {
+    NSDictionary *attributesDictionary = dictionary[kFaceAttributesKey];
+    NSString *genderValue = attributesDictionary[kAttributeGenderKey];
+    if ([genderValue isEqualToString:kGenderFemaleValue]) {
+        return FaceGenderFemale;
+    } else {
+        return FaceGenderMale;
+    }
 }
 
 @end
